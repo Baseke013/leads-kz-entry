@@ -1,0 +1,47 @@
+name: LEADS to TikTok sync
+
+on:
+  schedule:
+    - cron: '2-57/5 * * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/leads-sync.yml'
+
+permissions: {}
+
+concurrency:
+  group: leads-tiktok-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Refresh verified conversions and event delivery
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import datetime, json, time, urllib.request
+          base = 'https://kz-cpa-workbench.baseke017.chatgpt.site'
+          headers = {'User-Agent': 'Qarzhy-Sync/1.0 (+' + base + ')'}
+          def get(path):
+              with urllib.request.urlopen(urllib.request.Request(base + path, headers=headers), timeout=20) as response:
+                  return response.read()
+          for attempt in range(3):
+              try:
+                  get('/tiktok')
+                  time.sleep(3)
+                  state = json.loads(get('/api/tiktok/health'))
+                  stamp = datetime.datetime.fromisoformat(state['syncAt'].replace('Z', '+00:00'))
+                  age = (datetime.datetime.now(datetime.timezone.utc) - stamp).total_seconds()
+                  if not (state['ok'] and state['serverEventsConfigured'] and state['deliveryEnabled'] and not state['testMode'] and age < 1200):
+                      raise RuntimeError('Conversion sync or production delivery is not healthy')
+                  print('Verified LEADS sync:', state['syncAt'], '; production event delivery enabled')
+                  break
+              except Exception:
+                  if attempt == 2:
+                      raise
+                  time.sleep(5)
+          PY
