@@ -1,0 +1,7 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow"><title>Qarzhy — переход</title></head><body><p>Открываем страницу сервиса…</p><noscript>Для перехода включите JavaScript.</noscript><script>
+const from=new URL(location.href),next=new URL('https://kz-cpa-workbench.baseke017.chatgpt.site/go/facebook');
+for(const key of ['flow','exp','sig','fbclid','utm_source','utm_medium','utm_campaign','utm_content','campaign_id','adset_id','ad_id','creative_id','placement'])if(from.searchParams.has(key))next.searchParams.set(key,from.searchParams.get(key));
+if(!next.searchParams.has('utm_source'))next.searchParams.set('utm_source','facebook');
+location.replace(next.href);
+</script></body></html>
