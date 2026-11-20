@@ -1,4 +1,4 @@
-name: LEADS to TikTok sync
+name: LEADS to Meta sync
 
 on:
   schedule:
@@ -11,7 +11,7 @@ on:
 permissions: {}
 
 concurrency:
-  group: leads-tiktok-sync
+  group: leads-meta-sync
   cancel-in-progress: false
 
 jobs:
@@ -31,7 +31,7 @@ jobs:
                   return response.read()
           for attempt in range(3):
               try:
-                  state = json.loads(get('/api/tiktok/health?refresh=1'))
+                  state = json.loads(get('/api/facebook/health?refresh=1'))
                   stamp = datetime.datetime.fromisoformat(state['syncAt'].replace('Z', '+00:00'))
                   age = (datetime.datetime.now(datetime.timezone.utc) - stamp).total_seconds()
                   if not (state['ok'] and state['catalogReady'] and state['serverEventsConfigured'] and state['deliveryEnabled'] and not state['testMode'] and age < 600):
